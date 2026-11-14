@@ -114,6 +114,15 @@ export default function Compare({ experiments, evidence }) {
         </p>
       )}
 
+      {first && second && <div className="comparison-metrics" aria-label="Reported experimental measurements">
+        {[["Airflow", "airflow_cm_s", "cm/s"], ["Sample length", "sample_length_cm", "cm"], ["Sample width", "sample_width_cm", "cm"]].map(([label,key,unit]) => {
+          const values=[first,second].map(study=>study[key] && study[key] !== 'N/A' && Number.isFinite(Number(study[key])) ? Number(study[key]) : null);
+          const max=Math.max(...values.filter(v=>v!==null),1);
+          return <div className="comparison-metric" key={key}><span className="instrument-label">REPORTED / {label.toUpperCase()}</span>{[first,second].map((study,i)=><div key={i}><span>{study.experiment_id}</span><strong>{values[i]===null?'Not reported':`${values[i]} ${unit}`}</strong><div className="measurement-track"><i style={{width:values[i]===null?'0%':`${values[i]/max*100}%`}}/></div></div>)}</div>;
+        })}
+        <p>Bars compare selected records within each parameter. Missing values are not zero. Differences do not establish causation or fire risk.</p>
+      </div>}
+
       {first && second && (
         <>
           <div className="compare-table">

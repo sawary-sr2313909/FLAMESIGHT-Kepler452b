@@ -1,5 +1,6 @@
 
 :root {
+  color-scheme: dark;
   font-family: Inter, "Segoe UI", Arial, sans-serif;
   color: #e8eef9;
   background: #080f1c;
@@ -909,4 +910,33 @@ html {
 
 .ai-chat-answer li {
   margin-bottom: 8px;
+}
+
+/* Shared aerospace product treatment, retaining all research tools. */
+.sidebar { background: #0a1622; position: sticky; top: 0; height: 100vh; }
+.nav-item { text-decoration: none; color: #bcd0df; }
+.nav-item.active.compare-nav { background: transparent; }
+.nav-item:hover { background: #18313f; }
+.hero { background: radial-gradient(ellipse at 90% 20%,#21475355,transparent 70%),linear-gradient(120deg,#132b3b,#0e1b2a); }
+.hero h2 { letter-spacing: -1px; }
+.hero em { color: #93e4dc; }
+.hero-cta { display: flex; align-items: center; gap: 10px; color: #9ff0df; font-size: 13px; margin-top: 20px; text-decoration: none; }
+.hero-symbol { color: #78cec5; }
+.stat { background: #0e1d2c; }
+.experiment-card { transition: border-color .2s,transform .2s; }
+.experiment-card:hover { border-color: #73c9d0; transform: translateY(-3px); }
+section { scroll-margin-top: 24px; }
+:focus-visible { outline: 2px solid #97f3e3; outline-offset: 4px; }
+.disclosure { color: #a6bdcc; font-size: 12px; line-height: 1.8; padding-bottom: 30px; }
+.disclosure summary { cursor: pointer; color: #bbd3df; }
+.ai-chat-answer { white-space: normal; }
+@media(max-width:700px) {
+  .app { display: block; }
+  .sidebar { display: flex; position: static; width: 100%; height: auto; padding: 16px; flex-direction: row; flex-wrap: wrap; gap: 4px; }
+  .brand { width: 100%; margin-bottom: 10px; }
+  .nav-label,.sidebar-bottom { display: none; }
+  .nav-item { font-size: 11px; padding: 10px; margin: 0; gap: 6px; }
+  .nav-item svg { width: 14px; }
+  main { padding: 22px 16px; }
+  .status { font-size: 8px; }
 }
