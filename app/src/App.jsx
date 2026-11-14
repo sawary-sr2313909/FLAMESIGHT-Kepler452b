@@ -1,4 +1,5 @@
 import AIChat from "./AIChat";
+import MissionXRay from "./MissionXRay";
 import Ranking from "./Ranking";
 import SafetyBrief from "./SafetyBrief";
 import Compare from "./Compare";
@@ -10,6 +11,7 @@ import {
   ExternalLink, Orbit, ChevronDown,BrainCircuit
 } from "lucide-react";
 import "./App.css";
+import "./Product.css";
 
 const platforms = ["All platforms", "Cygnus", "ISS"];
 
@@ -20,6 +22,7 @@ export default function App() {
   const [platform, setPlatform] = useState("All platforms");
   const [selected, setSelected] = useState(null);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadData() {
@@ -37,15 +40,18 @@ export default function App() {
           a.text(), b.text()
         ]);
 
-        const parse = text => Papa.parse(text, {
-          header: true,
-          skipEmptyLines: true
-        }).data;
+        const parse = text => {
+          const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
+          if (parsed.errors.length) throw new Error('Invalid NASA CSV data.');
+          return parsed.data;
+        };
 
         setExperiments(parse(aText));
         setEvidence(parse(bText));
       } catch (err) {
         setError(err.message);
+      } finally {
+        setLoading(false);
       }
     }
     loadData();
@@ -76,9 +82,10 @@ export default function App() {
         </div>
 
         <div className="nav-label">MISSION INTELLIGENCE</div>
-        <div className="nav-item active">
+        <a className="nav-item active" href="#mission-xray"><ShieldCheck size={18}/> Mission Safety X-Ray</a>
+        <a className="nav-item" href="#explorer">
           <Database size={18} /> Experiment Explorer
-        </div>
+        </a>
         <a className="nav-item active compare-nav" href="#compare">
   <Microscope size={18} /> Compare Experiments
 </a>
@@ -100,42 +107,25 @@ export default function App() {
       <main>
         <header className="topbar">
           <div>
-            <span className="eyebrow">RESEARCH INTELLIGENCE PLATFORM</span>
-            <h1>Mission Control</h1>
+            <span className="eyebrow">FLAMESIGHT / COMBUSTION EVIDENCE LAB</span>
+            <h1>Research Operations <span>/ Mission workspace</span></h1>
           </div>
-          <span className="status"><span className="dot"/> DATA LOADED</span>
+          <span className="status" role="status"><span className="dot"/> {error ? 'DATA UNAVAILABLE' : loading ? 'LOADING DATA' : 'CURATED DATA READY'}</span>
         </header>
-
-        <section className="hero">
-          <div className="hero-content">
-            <span className="eyebrow">BEYOND EARTH. BEYOND ASSUMPTIONS.</span>
-            <h2>Fire behaves differently in space.<br/>
-              <em>Understanding it changes everything.</em>
-            </h2>
-            <p>
-              Transform NASA microgravity combustion research
-              into accessible, traceable scientific evidence
-              for safer human space exploration.
-            </p>
-            <span className="hero-tag">
-              <ShieldCheck size={15}/> NASA Evidence-Grounded Research
-            </span>
-          </div>
-          <div className="hero-symbol"><Flame size={120}/></div>
-        </section>
 
         {error && <div className="error">{error}</div>}
 
+        <MissionXRay experiments={experiments} evidence={evidence} loading={loading} error={error}/>
         <section className="stats">
           <div className="stat">
             <Database size={22}/>
             <strong>{experiments.length}</strong>
-            <span>NASA Studies</span>
+            <span>Curated NASA studies</span>
           </div>
           <div className="stat">
             <Microscope size={22}/>
             <strong>{evidence.length}</strong>
-            <span>Evidence Records</span>
+            <span>Traceable evidence records</span>
           </div>
           <div className="stat">
             <Orbit size={22}/>
@@ -149,7 +139,7 @@ export default function App() {
           </div>
         </section>
 
-        <section className="explorer">
+        <section className="explorer" id="explorer">
           <div className="section-heading">
             <div>
               <span className="eyebrow">NASA COMBUSTION DATABASE</span>
@@ -166,11 +156,13 @@ export default function App() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Search experiment, material, objective..."
+                aria-label="Search experiments"
               />
             </div>
             <div className="select-wrap">
               <Filter size={16}/>
               <select
+                aria-label="Filter by platform"
                 value={platform}
                 onChange={e => setPlatform(e.target.value)}
               >
@@ -212,7 +204,8 @@ export default function App() {
             })}
           </div>
 
-          {filtered.length === 0 && !error &&
+          {loading && <p className="empty" role="status">Loading NASA research records…</p>}
+          {filtered.length === 0 && !error && !loading &&
             <p className="empty">No matching experiments found.</p>}
         </section>
         <Compare
@@ -232,6 +225,7 @@ export default function App() {
           FLAMESIGHT · Kepler_452b · NASA Space Apps Challenge 2026
           <span>Research prototype · Not a certified fire-risk assessment</span>
         </footer>
+        <details className="disclosure"><summary>Scientific limitations & AI-use disclosure</summary><p>NASA sources are linked research references; curated records are selected extractions and have not been independently verified by this application. Research objectives describe intended work, not demonstrated results. All cabin geometry and mission scenarios are illustrative. Relevance scores are research navigation heuristics, not fire probabilities or certified safety advice.</p><p>AI assistance: Codex assisted with code, interface design, 3D cabin and SVG fallback authoring, matching logic and tests. Gemini generates optional interpretations from curated records. Existing NASA CSV values and schemas are preserved; no measurements were generated or imputed. The conceptual habitat uses original code-authored geometry, without NASA logos or mission imagery. The editable Spline scene is rendered through an approved published React code export; the website itself has not been deployed by this work. Component names map only to illustrative interface zones, not NASA study test hardware. Review challenge submission requirements and maintain this disclosure with the project.</p></details>
       </main>
 
       {selected && (
